@@ -1,3 +1,5 @@
+package RayTracing;
+
 /**
  * An aggregate class of material properties.
  */

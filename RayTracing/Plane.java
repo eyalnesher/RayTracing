@@ -1,3 +1,5 @@
+package RayTracing;
+
 import java.util.Optional;
 
 public class Plane extends Surface {

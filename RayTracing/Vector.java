@@ -1,3 +1,5 @@
+package RayTracing;
+
 /**
  * An implementation of three-dimentional vector and vector arithmetics.
  */
