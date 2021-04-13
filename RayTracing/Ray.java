@@ -13,4 +13,14 @@ public class Ray {
         this.origin = origin;
         this.direction = direction;
     }
+
+    /**
+     * Get a point on the ray.
+     * 
+     * @param offset The distance of the desired point from the origin.
+     * @return The point on the ray in distance `distance` from its origin.
+     */
+    public Vector point(double offset) {
+        return this.origin.add(this.direction.mul(offset));
+    }
 }
