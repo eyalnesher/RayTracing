@@ -1,5 +1,7 @@
 package RayTracing;
 
+import RayTracing.Ray;
+import RayTracing.Vector;
 import jdk.tools.jlink.resources.jlink_ja;
 
 /**
@@ -25,11 +27,11 @@ public class Light {
      * @param s the Scene object.
      * @return light intensity at the given point.
      */
-    public double lightIntensity(Vector point, Scene s) {
+    public double lightIntensity(Vector point, Scene scene) {
         // TODO
-        Vector lightRay = point.clone().add(this.position);
-        Vector u = lightRay.getPerp();
-        Vector v = lightRay.cross(u);
+        Vector lightVector = point.clone().add(this.position);
+        Vector u = lightVector.getPerp();
+        Vector v = lightVector.cross(u);
         Vector[][] originPoints = new Vector[N][N]; // A collection of N^2 points from which we shoot rays at the target.
         
         for (int i = -N/2; i < (N/2); i++) {
@@ -41,12 +43,19 @@ public class Light {
         }
 
         // Test collisions
+        double totalCollisions = 0;
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-
+                Ray lightRay = new Ray(originPoints[i][j], point);
+                if (lightRay.closestCollision(scene).isPresent()) {
+                    if (point.equals(lightRay.closestCollision(scene).get().getValue())) {
+                        totalCollisions += 1;
+                    }
+                }
             }
         }
-        return 0.0;
+        double lightIntensity = (1-this.shadowIntensity) + this.shadowIntensity*(totalCollisions / (N*N));
+        return lightIntensity;
     }
     
 }

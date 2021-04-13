@@ -1,5 +1,7 @@
 package RayTracing;
 
+import java.util.Optional;
+
 /**
  * A class representing a ray from a point in the scene.
  */
@@ -12,5 +14,24 @@ public class Ray {
     public Ray(Vector origin, Vector direction) {
         this.origin = origin;
         this.direction = direction;
+    }
+
+    public Optional<Pair<Surface,Vector>> closestCollision(Scene s) {
+        Optional<Pair<Surface,Vector>> closestCollision = new Optional<>();
+        double distance = -1;
+        for (Surface obj: s.sceneObjects) {
+            Optional<Vector> current = obj.intersection(this);
+            if (current.isPresent()) {
+                if (distance < 0) {
+                    closestCollision = Optional.of(new Pair<>(obj, current.get()));
+                }
+                double currDist = this.origin.distance(current.get());
+                if (currDist < distance) {
+                    closestCollision = Optional.of(new Pair<>(obj, current.get()));
+                    distance = currDist;
+                }
+            }
+        }
+        return closestCollision;
     }
 }
