@@ -3,7 +3,7 @@ package RayTracing;
 import java.util.Optional;
 
 /**
- * A class representing a surfece (an object) in the scene.
+ * A class representing a surface (an object) in the scene.
  */
 public abstract class Surface {
     protected final Material material; // The material the surface is made from

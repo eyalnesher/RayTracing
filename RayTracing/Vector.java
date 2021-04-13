@@ -78,7 +78,7 @@ public class Vector {
      * @return the dot product of this and `other`.
      */
     public double dot(Vector other) {
-        return this.x *= other.x + this.y * other.y + this.z * other.z;
+        return this.x * other.x + this.y * other.y + this.z * other.z;
     }
 
     /**
@@ -98,6 +98,17 @@ public class Vector {
      */
     public double distance(Vector other) {
         return Math.sqrt(Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2) + Math.pow(this.z - other.z, 2));
+    }
+
+    /**
+     * Generates a vector perpendicular to this one given desired x, y
+     * @return A vector v that satisfies dot(this, v) == 0
+     */
+    public Vector getPerp() {
+        if (this.x == 0 && this.y == 0) {
+            return new Vector(1, 1, 0);
+        }
+        return new Vector(-this.y, this.x, 0);
     }
 
 }
