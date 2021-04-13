@@ -1,8 +1,10 @@
 package RayTracing;
+
 import java.util.List;
 
 /**
- * A representation of the overall scene holding the camera, scene parameters and entities.
+ * A representation of the overall scene holding the camera, scene parameters
+ * and entities.
  */
 public class Scene {
     public final Vector bgColor;
@@ -14,7 +16,8 @@ public class Scene {
     public List<Surface> sceneObjects;
     public List<Light> lights;
 
-    public Scene(Vector bgColor, int shadowRays, int recursionDepth, boolean fisheye, Camera camera, List<Surface> objects, List<Light> lights) {
+    public Scene(Vector bgColor, int shadowRays, int recursionDepth, boolean fisheye, Camera camera,
+            List<Surface> objects, List<Light> lights) {
         this.bgColor = bgColor;
         this.shadowRays = shadowRays;
         this.recursionDepth = recursionDepth;
@@ -24,11 +27,11 @@ public class Scene {
         this.lights = lights;
     }
 
-    public addObject(Surface s) {
+    public void addObject(Surface s) {
         this.sceneObjects.add(s);
     }
 
-    public addLight(Light l) {
+    public void addLight(Light l) {
         this.lights.add(l);
     }
 

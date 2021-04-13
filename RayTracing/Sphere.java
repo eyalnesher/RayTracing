@@ -14,8 +14,24 @@ public class Sphere extends Surface {
 
     @Override
     public Optional<Vector> intersection(Ray ray) {
-        // TODO
-        return Optional.empty();
+
+        // Calculates the intersection of a ray and a sphere as seen in class
+
+        Vector diff = this.center.sub(ray.origin);
+        double projection = diff.dot(ray.direction);
+
+        if (projection < 0) {
+            return Optional.empty();
+        }
+
+        double squaredDistance = diff.dot(diff) - projection * projection;
+
+        double squaredLength = this.radius * this.radius - squaredDistance;
+        if (squaredLength < 0) {
+            return Optional.empty();
+        }
+
+        return Optional.of(ray.point(projection - Math.sqrt(squaredLength)));
     }
 
 }

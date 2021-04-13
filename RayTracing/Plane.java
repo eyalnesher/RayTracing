@@ -23,7 +23,7 @@ public class Plane extends Surface {
             Vector diff = this.normal.mul(distance).sub(ray.origin);
             double length = diff.dot(this.normal);
             if (length >= 0) {
-                return Optional.of(ray.origin.add(ray.direction.mul(length)));
+                return Optional.of(ray.point(length));
             }
         }
         return Optional.empty();
