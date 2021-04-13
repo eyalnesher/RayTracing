@@ -99,4 +99,16 @@ public class Vector {
         return new Vector(-this.y, this.x, 0);
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (!other.getClass().equals(this.getClass())) {
+            return false;
+        }
+        if ((this.x == other.x) && (this.y == other.y) && (this.z == other.z)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }
