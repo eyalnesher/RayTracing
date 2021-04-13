@@ -88,6 +88,15 @@ public class Vector {
     }
 
     /**
+     * Calculates a coordinate-wise multiplication of two vectors
+     * 
+     * @return A new vector whose coordinates are a product of this and other's matching coordinates.
+     */
+    public Vector pointMult(Vector other) {
+        return new Vector(this.x*other.x, this.y*other.y, this.z*other.z);
+    }
+
+    /**
      * Generate a vector perpendicular to `this`.
      * 
      * @return A vector `v` that satisfies `dot(this, v)` == 0.

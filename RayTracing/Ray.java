@@ -1,6 +1,7 @@
 package RayTracing;
 
 import java.util.Optional;
+import java.util.Pair;
 
 /**
  * A class representing a ray from a point in the scene.
@@ -33,6 +34,7 @@ public class Ray {
             }
         }
         return closestCollision;
+    }
 
     /**
      * Get a point on the ray.

@@ -1,8 +1,9 @@
 package RayTracing;
 
+import java.util.Random;
+
 import RayTracing.Ray;
 import RayTracing.Vector;
-import jdk.tools.jlink.resources.jlink_ja;
 
 /**
  * A class representing a light source in the scene
@@ -32,20 +33,21 @@ public class Light {
         Vector lightVector = point.clone().add(this.position);
         Vector u = lightVector.getPerp();
         Vector v = lightVector.cross(u);
-        Vector[][] originPoints = new Vector[N][N]; // A collection of N^2 points from which we shoot rays at the target.
-        
-        for (int i = -N/2; i < (N/2); i++) {
-            for (int j = -N/2; j < (N/2); j++) {
-                double t = (i+Random.nextDouble())*r/N;
-                double s = (j+Random.nextDouble())*r/N;
-                originPoints[i][j] = this.position.clone().add(u.clone().mult(t)).add(v.clone().mult(s));
+        Vector[][] originPoints = new Vector[scene.shadowRays][scene.shadowRays]; // A collection of N^2 points from which we shoot rays at the target.
+        Random r = new Random();
+
+        for (int i = -scene.shadowRays/2; i < (scene.shadowRays/2); i++) {
+            for (int j = -scene.shadowRays/2; j < (scene.shadowRays/2); j++) {
+                double t = (i+r.nextDouble())*this.radius/scene.shadowRays;
+                double s = (j+r.nextDouble())*this.radius/scene.shadowRays;
+                originPoints[i][j] = this.position.add(u.mul(t)).add(v.mul(s));
             }
         }
 
         // Test collisions
         double totalCollisions = 0;
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
+        for (int i = 0; i < scene.shadowRays; i++) {
+            for (int j = 0; j < scene.shadowRays; j++) {
                 Ray lightRay = new Ray(originPoints[i][j], point);
                 if (lightRay.closestCollision(scene).isPresent()) {
                     if (point.equals(lightRay.closestCollision(scene).get().getValue())) {
@@ -54,7 +56,7 @@ public class Light {
                 }
             }
         }
-        double lightIntensity = (1-this.shadowIntensity) + this.shadowIntensity*(totalCollisions / (N*N));
+        double lightIntensity = (1-this.shadowIntensity) + this.shadowIntensity*(totalCollisions / (scene.shadowRays*scene.shadowRays));
         return lightIntensity;
     }
     
