@@ -79,12 +79,22 @@ public class Vector {
     }
 
     /**
+     * Calculate the square of the euclidian distance of two vectors.
+     * 
+     * @return the squared euclidian distance from `other`.
+     */
+    public double squaredDistance(Vector other) {
+        Vector difference = this.sub(other);
+        return difference.dot(difference);
+    }
+
+    /**
      * Calculate the euclidian distance of two vectors.
      * 
-     * @return the euclidian distance from other.
+     * @return the euclidian distance from `other`.
      */
     public double distance(Vector other) {
-        return Math.sqrt(Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2) + Math.pow(this.z - other.z, 2));
+        return Math.sqrt(this.squaredDistance(other));
     }
 
     /**
