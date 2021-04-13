@@ -18,7 +18,14 @@ public class Plane extends Surface {
 
     @Override
     public Optional<Vector> intersection(Ray ray) {
-        // TODO
+        double denominator = this.normal.dot(ray.direction);
+        if (Math.abs(denominator) > 0) {
+            Vector diff = this.normal.mul(distance).sub(ray.origin);
+            double length = diff.dot(this.normal);
+            if (length >= 0) {
+                return Optional.of(ray.origin.add(ray.direction.mul(length)));
+            }
+        }
         return Optional.empty();
     }
 }
