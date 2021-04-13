@@ -104,7 +104,8 @@ public class Vector {
         if (!other.getClass().equals(this.getClass())) {
             return false;
         }
-        if ((this.x == other.x) && (this.y == other.y) && (this.z == other.z)) {
+        Vector vector = (Vector) other;
+        if ((this.x == vector.x) && (this.y == vector.y) && (this.z == vector.z)) {
             return true;
         } else {
             return false;
