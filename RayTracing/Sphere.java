@@ -38,14 +38,4 @@ public class Sphere extends Surface {
                 .of(new SimpleImmutableEntry<Vector, Vector>(intersectionPoint, intersectionPoint.sub(this.center)));
     }
 
-    @Override
-    public Optional<Vector> normal(Vector point) {
-        Optional<Vector> normal = Optional.empty();
-        if (this.center.distance(point) != radius) {
-            // Point is not on sphere
-            return normal;
-        }
-        return Optional.of(this.center.add(point.mul(2)));
-    }
-
 }

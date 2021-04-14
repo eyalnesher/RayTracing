@@ -32,7 +32,6 @@ public class Light {
      * @return light intensity at the given point.
      */
     public double lightIntensity(Vector point, Scene scene) {
-        // TODO
         Vector lightVector = point.clone().add(this.position);
         Vector u = lightVector.getPerp();
         Vector v = lightVector.cross(u);
@@ -52,7 +51,7 @@ public class Light {
         for (int i = 0; i < scene.shadowRays; i++) {
             for (int j = 0; j < scene.shadowRays; j++) {
                 Ray lightRay = new Ray(originPoints[i][j], point);
-                Optional<SimpleImmutableEntry<Surface, Vector>> closestCollision = lightRay.closestCollision(scene)
+                Optional<SimpleImmutableEntry<Surface, Vector>> closestCollision = lightRay.closestCollision(scene);
                 if (closestCollision.isPresent()) {
                     if (point.equals(closestCollision.get().getValue())) {
                         totalCollisions += 1;
