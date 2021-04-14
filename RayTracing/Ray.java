@@ -1,7 +1,8 @@
 package RayTracing;
 
-import java.util.Optional;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Optional;
 
 /**
  * A class representing a ray from a point in the scene.
@@ -17,18 +18,19 @@ public class Ray {
         this.direction = direction;
     }
 
-    public Optional<SimpleEntry<Surface,Vector>> closestCollision(Scene s) {
-        Optional<SimpleEntry<Surface,Vector>> closestCollision = Optional.empty();
+    public Optional<SimpleEntry<Surface, Vector>> closestCollision(Scene s) {
+        Optional<SimpleEntry<Surface, Vector>> closestCollision = Optional.empty();
         double distance = -1;
-        for (Surface obj: s.sceneObjects) {
-            Optional<Vector> current = obj.intersection(this);
+        for (Surface obj : s.sceneObjects) {
+            Optional<SimpleImmutableEntry<Vector, Vector>> current = obj.intersection(this);
             if (current.isPresent()) {
+                Vector currentPoint = current.get().getKey();
                 if (distance < 0) {
-                    closestCollision = Optional.of(new SimpleEntry<>(obj, current.get()));
+                    closestCollision = Optional.of(new SimpleEntry<>(obj, currentPoint));
                 }
-                double currDist = this.origin.distance(current.get());
+                double currDist = this.origin.distance(currentPoint);
                 if (currDist < distance) {
-                    closestCollision = Optional.of(new SimpleEntry<>(obj, current.get()));
+                    closestCollision = Optional.of(new SimpleEntry<>(obj, currentPoint));
                     distance = currDist;
                 }
             }

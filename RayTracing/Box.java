@@ -1,6 +1,6 @@
 package RayTracing;
 
-import java.util.AbstractMap.SimpleEntry;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -33,7 +33,7 @@ public class Box extends Surface {
      * @param axis The axis which identifies the faces (x, y or z).
      * @return The planes which extend the two faces perpendicular to `axis`.
      */
-    private SimpleEntry<Plane, Plane> faces(Axis axis) {
+    private SimpleImmutableEntry<Plane, Plane> faces(Axis axis) {
         double position = 0;
 
         switch (axis) {
@@ -52,7 +52,7 @@ public class Box extends Surface {
 
         }
 
-        return new SimpleEntry<Plane, Plane>(new Plane(axis.axis, position - this.length / 2, this.material),
+        return new SimpleImmutableEntry<Plane, Plane>(new Plane(axis.axis, position - this.length / 2, this.material),
                 new Plane(axis.axis, position + this.length / 2, this.material));
     }
 
@@ -119,23 +119,25 @@ public class Box extends Surface {
     }
 
     @Override
-    public Optional<Vector> intersection(Ray ray) {
-        ArrayList<Vector> intersections = new ArrayList<>();
+    public Optional<SimpleImmutableEntry<Vector, Vector>> intersection(Ray ray) {
+        ArrayList<SimpleImmutableEntry<Vector, Vector>> intersections = new ArrayList<>();
         for (Axis axis : Axis.values()) {
-            SimpleEntry<Plane, Plane> faces = this.faces(axis);
-            Optional<Vector> intersection1 = faces.getKey().intersection(ray);
-            Optional<Vector> intersection2 = faces.getValue().intersection(ray);
-            if (!intersection1.isEmpty()) {
+            SimpleImmutableEntry<Plane, Plane> faces = this.faces(axis);
+            Optional<SimpleImmutableEntry<Vector, Vector>> intersection1 = faces.getKey().intersection(ray);
+            Optional<SimpleImmutableEntry<Vector, Vector>> intersection2 = faces.getValue().intersection(ray);
+            if (!intersection1.isEmpty() && this.inFaceBounds(intersection1.get().getKey(), axis)) {
                 intersections.add(intersection1.get());
             }
-            if (!intersection2.isEmpty()) {
+            if (!intersection2.isEmpty() && this.inFaceBounds(intersection1.get().getKey(), axis)) {
                 intersections.add(intersection2.get());
             }
         }
 
         return intersections.stream()
-                .max((Vector point1, Vector point2) -> ((Double) point1.squaredDistance(ray.origin))
-                        .compareTo((Double) point2.squaredDistance(ray.origin)));
+                .max((SimpleImmutableEntry<Vector, Vector> intersection1,
+                        SimpleImmutableEntry<Vector, Vector> intersection2) -> ((Double) intersection1.getKey()
+                                .squaredDistance(ray.origin))
+                                        .compareTo((Double) intersection1.getKey().squaredDistance(ray.origin)));
 
     }
 }
