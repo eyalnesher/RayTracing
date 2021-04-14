@@ -1,5 +1,6 @@
 package RayTracing;
 
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Optional;
 
 /**
@@ -14,16 +15,11 @@ public abstract class Surface {
 
     /**
      * Check if a ray intersects with the surface, and if so, calculate the point of
-     * interseciton.
+     * interseciton and the normal of the surface at the intersection point.
      * 
-     * @return the point of intersection of this and `ray`, if exists.
+     * @return A pair of the point of intersection of this and `ray` and the normal
+     *         to the surface, if such an intersection exists.
      */
-    public abstract Optional<Vector> intersection(Ray ray);
 
-    /**
-     * Finds a Normal to surface at point
-     * 
-     * @return A vector normal to the surface
-     */
-    public abstract Optional<Vector> normal(Vector point);
+    public abstract Optional<SimpleImmutableEntry<Vector, Vector>> intersection(Ray ray);
 }

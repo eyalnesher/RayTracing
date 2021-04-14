@@ -2,7 +2,7 @@ package RayTracing;
 
 import java.util.Optional;
 import java.util.Random;
-import java.util.AbstractMap.SimpleEntry;
+import java.util.AbstractMap.SimpleImmutableEntry;
 
 import RayTracing.Ray;
 import RayTracing.Surface;
@@ -52,8 +52,9 @@ public class Light {
         for (int i = 0; i < scene.shadowRays; i++) {
             for (int j = 0; j < scene.shadowRays; j++) {
                 Ray lightRay = new Ray(originPoints[i][j], point);
-                if (lightRay.closestCollision(scene).isPresent()) {
-                    if (point.equals(lightRay.closestCollision(scene).get().getValue())) {
+                Optional<SimpleImmutableEntry<Surface, Vector>> closestCollision = lightRay.closestCollision(scene)
+                if (closestCollision.isPresent()) {
+                    if (point.equals(closestCollision.get().getValue())) {
                         totalCollisions += 1;
                     }
                 }
@@ -77,15 +78,14 @@ public class Light {
             // Calculate brightness of light at point.
             // brightness = dot(N, L) where N is the normal to the surface at point and L is the vector to the light
             Ray rayToPoint = new Ray(l.position, point);
-            Optional<SimpleEntry<Surface, Vector>> collision = rayToPoint.closestCollision(s);
+            Optional<SimpleImmutableEntry<Surface, Vector>> collision = rayToPoint.closestCollision(s);
             if (collision.isPresent()) {
                 Surface obj = collision.get().getKey();
                 Vector collisionPoint = collision.get().getValue();
                 if (point.equals(collisionPoint)) {
-                    Vector lightVector = Ray.reverse(rayToPoint).point(1);
-                    Optional<Vector> normal = obj.normal(point);
-                    if (normal.isPresent()) {
-                        brightness = lightVector.dot(normal.get());
+                    Optional<SimpleImmutableEntry<Vector, Vector>> intersection = obj.intersection(rayToPoint);
+                    if (intersection.isPresent()) {
+                        brightness = (intersection.get().getKey().add(l.position)).dot(intersection.get().getValue());
                         if (specular) {
                             brightness = Math.pow(brightness, obj.material.phong);
                         }

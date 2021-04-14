@@ -1,7 +1,7 @@
 package RayTracing;
 
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Optional;
-import java.util.AbstractMap.SimpleEntry;
 
 /**
  * A class representing a ray from a point in the scene.
@@ -17,18 +17,19 @@ public class Ray {
         this.direction = direction;
     }
 
-    public Optional<SimpleEntry<Surface,Vector>> closestCollision(Scene s) {
-        Optional<SimpleEntry<Surface,Vector>> closestCollision = Optional.empty();
+    public Optional<SimpleImmutableEntry<Surface, Vector>> closestCollision(Scene s) {
+        Optional<SimpleImmutableEntry<Surface, Vector>> closestCollision = Optional.empty();
         double distance = -1;
-        for (Surface obj: s.sceneObjects) {
-            Optional<Vector> current = obj.intersection(this);
+        for (Surface obj : s.sceneObjects) {
+            Optional<SimpleImmutableEntry<Vector, Vector>> current = obj.intersection(this);
             if (current.isPresent()) {
+                Vector currentPoint = current.get().getKey();
                 if (distance < 0) {
-                    closestCollision = Optional.of(new SimpleEntry<>(obj, current.get()));
+                    closestCollision = Optional.of(new SimpleImmutableEntry<>(obj, currentPoint));
                 }
-                double currDist = this.origin.distance(current.get());
+                double currDist = this.origin.distance(currentPoint);
                 if (currDist < distance) {
-                    closestCollision = Optional.of(new SimpleEntry<>(obj, current.get()));
+                    closestCollision = Optional.of(new SimpleImmutableEntry<>(obj, currentPoint));
                     distance = currDist;
                 }
             }
@@ -74,11 +75,11 @@ public class Ray {
      */
     private Vector trace(Scene s, int recursionDepth) {
         if (recursionDepth >= s.recursionDepth) {
-            return new Vector(0, 0, 0);
+            return s.bgColor;
         }
-        Optional<SimpleEntry<Surface, Vector>> collision = this.closestCollision(s);
+        Optional<SimpleImmutableEntry<Surface, Vector>> collision = this.closestCollision(s);
         if (!collision.isPresent()) {
-            return new Vector(0, 0, 0);
+            return s.bgColor;
         }
         Surface obj = collision.get().getKey();
         Vector point = collision.get().getValue();
@@ -86,12 +87,12 @@ public class Ray {
         baseOutput = baseOutput.add(obj.material.specular.pointMult(Light.lightAtPoint(point, s, true)));
         baseOutput = baseOutput.mul(1-obj.material.transparency);
         baseOutput = baseOutput.add(s.bgColor.mul(obj.material.transparency));
-        Optional<Vector> normal = obj.normal(point);
-        if (!normal.isPresent()) {
+        Optional<SimpleImmutableEntry<Vector, Vector>> intersection = obj.intersection(this);
+        if (!intersection.isPresent()) {
             return baseOutput;
         }
 
-        Ray reflectedRay = new Ray(point, point.sub(normal.get().mul(2*point.dot(normal.get()))));
+        Ray reflectedRay = new Ray(point, point.sub(intersection.get().getValue().mul(2*point.dot(intersection.get().getValue()))));
         return baseOutput.add(obj.material.reflection.pointMult(reflectedRay.trace(s, recursionDepth + 1)));
     }
 }
