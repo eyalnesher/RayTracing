@@ -1,8 +1,11 @@
 package RayTracing;
 
+import java.util.Optional;
 import java.util.Random;
+import java.util.AbstractMap.SimpleEntry;
 
 import RayTracing.Ray;
+import RayTracing.Surface;
 import RayTracing.Vector;
 
 /**
@@ -58,6 +61,45 @@ public class Light {
         }
         double lightIntensity = (1-this.shadowIntensity) + this.shadowIntensity*(totalCollisions / (scene.shadowRays*scene.shadowRays));
         return lightIntensity;
+    }
+
+    /**
+     * Calculates the RGB value of the light multiplier at a given point
+     * @param point the given point
+     * @param s The relevant scene
+     * @param specular Whether or not to calculate specular light; if true, multiplies each light by its' specular intensity
+     * @return The diffuse color multiplier.
+     */
+    public static Vector LightAtPoint(Vector point, Scene s, boolean specular) {
+        Vector ret = new Vector(1, 1, 1);
+        double brightness = 1;
+        for (Light l: s.lights) {
+            // Calculate brightness of light at point.
+            // brightness = dot(N, L) where N is the normal to the surface at point and L is the vector to the light
+            Ray rayToPoint = new Ray(l.position, point);
+            Optional<SimpleEntry<Surface, Vector>> collision = rayToPoint.closestCollision(s);
+            if (collision.isPresent()) {
+                Surface obj = collision.get().getKey();
+                Vector collisionPoint = collision.get().getValue();
+                if (point.equals(collisionPoint)) {
+                    Vector lightVector = Ray.reverse(rayToPoint).point(1);
+                    Optional<Vector> normal = obj.normal(point);
+                    if (normal.isPresent()) {
+                        brightness = lightVector.dot(normal.get());
+                        if (specular) {
+                            brightness = Math.pow(brightness, obj.material.phong);
+                        }
+                    }
+                }
+            }
+            if (specular) {
+                ret = ret.pointMult(l.color.mul(l.lightIntensity(point, s)).mul(l.specularIntensity).mul(brightness));
+            } else {
+                ret = ret.pointMult(l.color.mul(l.lightIntensity(point, s)).mul(brightness));
+            }
+            
+        }
+        return ret;
     }
     
 }

@@ -34,4 +34,14 @@ public class Sphere extends Surface {
         return Optional.of(ray.point(projection - Math.sqrt(squaredLength)));
     }
 
+    @Override
+    public Optional<Vector> normal(Vector point) {
+        Optional<Vector> normal = Optional.empty();
+        if (this.center.distance(point) != radius) {
+            // Point is not on sphere
+            return normal;
+        }
+        return Optional.of(this.center.add(point.mul(2)));
+    }
+
 }

@@ -19,4 +19,11 @@ public abstract class Surface {
      * @return the point of intersection of this and `ray`, if exists.
      */
     public abstract Optional<Vector> intersection(Ray ray);
+
+    /**
+     * Finds a Normal to surface at point
+     * 
+     * @return A vector normal to the surface
+     */
+    public abstract Optional<Vector> normal(Vector point);
 }
