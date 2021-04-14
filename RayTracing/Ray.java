@@ -75,24 +75,32 @@ public class Ray {
      */
     private Vector trace(Scene s, int recursionDepth) {
         if (recursionDepth >= s.recursionDepth) {
+            // Reached maximum recursion depth
             return s.bgColor;
         }
         Optional<SimpleImmutableEntry<Surface, Vector>> collision = this.closestCollision(s);
         if (!collision.isPresent()) {
+            // Ray doesn't collide with anything, just veer off into the MAX_DOUBLE void
             return s.bgColor;
         }
         Surface obj = collision.get().getKey();
         Vector point = collision.get().getValue();
+
+        // Output = (Mdiff*Ldiff + Mspec*Lspec)(1-transparency) + bgColor*transperency + Mreflect*(reflectedColor)
+        // Start with the non-reflection values that we know:
         Vector baseOutput = obj.material.diffuse.pointMult(Light.lightAtPoint(point, s, false));
         baseOutput = baseOutput.add(obj.material.specular.pointMult(Light.lightAtPoint(point, s, true)));
         baseOutput = baseOutput.mul(1-obj.material.transparency);
         baseOutput = baseOutput.add(s.bgColor.mul(obj.material.transparency));
+
         Optional<SimpleImmutableEntry<Vector, Vector>> intersection = obj.intersection(this);
         if (!intersection.isPresent()) {
+            // should be impossible as we confirmed that the ray did hit, but just to be safe
             return baseOutput;
         }
 
         Ray reflectedRay = new Ray(point, point.sub(intersection.get().getValue().mul(2*point.dot(intersection.get().getValue()))));
+        // Add the Mreflect*(reflectedColor) part:
         return baseOutput.add(obj.material.reflection.pointMult(reflectedRay.trace(s, recursionDepth + 1)));
     }
 }

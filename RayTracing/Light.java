@@ -92,8 +92,10 @@ public class Light {
                 }
             }
             if (specular) {
+                // specular light(R, G, B) = Color*intensity*specularIntensity*(dot(N,L)^phong)
                 ret = ret.pointMult(l.color.mul(l.lightIntensity(point, s)).mul(l.specularIntensity).mul(brightness));
             } else {
+                // diffuse light(R, G, B) = Color*intensity*dot(N,L)
                 ret = ret.pointMult(l.color.mul(l.lightIntensity(point, s)).mul(brightness));
             }
             
