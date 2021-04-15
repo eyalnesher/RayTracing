@@ -71,44 +71,38 @@ public class Ray {
     }
 
     /**
-     * The recursive calculation of trace
+     * The recursive calculation of a trace.
      * 
-     * @param s              The relevant scene
+     * @param scene          The relevant scene
      * @param recursionDepth current recursion depth
      * @return A color vector representing the color of the point the ray first
      *         hits.
      */
-    private Vector trace(Scene s, int recursionDepth) {
-        if (recursionDepth >= s.recursionDepth) {
+    private Vector trace(Scene scene, int recursionDepth) {
+        if (recursionDepth >= scene.recursionDepth) {
             // Reached maximum recursion depth
-            return s.bgColor;
+            return scene.bgColor;
         }
-        Optional<Triple<Surface, Vector, Vector>> collision = this.closestCollision(s);
+        Optional<Triple<Surface, Vector, Vector>> collision = this.closestCollision(scene);
         if (!collision.isPresent()) {
             // Ray doesn't collide with anything, just veer off into the MAX_DOUBLE void
-            return s.bgColor;
+            return scene.bgColor;
         }
-        Surface obj = collision.get().first();
+        Surface surface = collision.get().first();
         Vector point = collision.get().second();
 
         // Output = (Mdiff*Ldiff + Mspec*Lspec)(1-transparency) + bgColor*transperency +
         // Mreflect*(reflectedColor)
         // Start with the non-reflection values that we know:
-        Vector baseOutput = obj.material.diffuse.pointMult(Light.lightAtPoint(point, s, false));
-        baseOutput = baseOutput.add(obj.material.specular.pointMult(Light.lightAtPoint(point, s, true)));
-        baseOutput = baseOutput.mul(1 - obj.material.transparency);
-        baseOutput = baseOutput.add(s.bgColor.mul(obj.material.transparency));
+        Vector baseOutput = surface.material.diffuse.pointMult(Light.lightAtPoint(point, scene, false));
+        baseOutput = baseOutput.add(surface.material.specular.pointMult(Light.lightAtPoint(point, scene, true)));
+        baseOutput = baseOutput.mul(1 - surface.material.transparency);
+        baseOutput = baseOutput.add(scene.bgColor.mul(surface.material.transparency));
 
-        Optional<Pair<Vector, Vector>> intersection = obj.intersection(this);
-        if (!intersection.isPresent()) {
-            // should be impossible as we confirmed that the ray did hit, but just to be
-            // safe
-            return baseOutput;
-        }
+        Vector normal = collision.get().third();
 
-        Ray reflectedRay = new Ray(point,
-                point.sub(intersection.get().second().mul(2 * point.dot(intersection.get().second()))));
+        Ray reflectedRay = new Ray(point, point.sub(normal.mul(2 * point.dot(normal))));
         // Add the Mreflect*(reflectedColor) part:
-        return baseOutput.add(obj.material.reflection.pointMult(reflectedRay.trace(s, recursionDepth + 1)));
+        return baseOutput.add(surface.material.reflection.pointMult(reflectedRay.trace(scene, recursionDepth + 1)));
     }
 }
