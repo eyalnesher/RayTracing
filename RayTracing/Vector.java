@@ -100,10 +100,11 @@ public class Vector {
     /**
      * Calculates a coordinate-wise multiplication of two vectors
      * 
-     * @return A new vector whose coordinates are a product of this and other's matching coordinates.
+     * @return A new vector whose coordinates are a product of this and other's
+     *         matching coordinates.
      */
     public Vector pointMult(Vector other) {
-        return new Vector(this.x*other.x, this.y*other.y, this.z*other.z);
+        return new Vector(this.x * other.x, this.y * other.y, this.z * other.z);
     }
 
     /**
@@ -129,6 +130,18 @@ public class Vector {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Compare the distances of two vectors from `this`.
+     * 
+     * @param u The first vector in the comparison.
+     * @param v A second vector in the comparison.
+     * @return -1 if `u` is closer to `this` then `v`, 0 if the distances are equal,
+     *         and 1 otherwise.
+     */
+    public int compareDistances(Vector u, Vector v) {
+        return ((Double) this.squaredDistance(u)).compareTo((Double) this.squaredDistance(v));
     }
 
 }
