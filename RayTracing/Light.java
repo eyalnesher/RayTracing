@@ -28,6 +28,7 @@ public class Light {
 
     /**
      * Calculates the intensity of this light at given point
+     * 
      * @param s the Scene object.
      * @return light intensity at the given point.
      */
@@ -35,13 +36,14 @@ public class Light {
         Vector lightVector = point.clone().add(this.position);
         Vector u = lightVector.getPerp();
         Vector v = lightVector.cross(u);
-        Vector[][] originPoints = new Vector[scene.shadowRays][scene.shadowRays]; // A collection of N^2 points from which we shoot rays at the target.
+        Vector[][] originPoints = new Vector[scene.shadowRays][scene.shadowRays]; // A collection of N^2 points from
+                                                                                  // which we shoot rays at the target.
         Random r = new Random();
 
-        for (int i = -scene.shadowRays/2; i < (scene.shadowRays/2); i++) {
-            for (int j = -scene.shadowRays/2; j < (scene.shadowRays/2); j++) {
-                double t = (i+r.nextDouble())*this.radius/scene.shadowRays;
-                double s = (j+r.nextDouble())*this.radius/scene.shadowRays;
+        for (int i = -scene.shadowRays / 2; i < (scene.shadowRays / 2); i++) {
+            for (int j = -scene.shadowRays / 2; j < (scene.shadowRays / 2); j++) {
+                double t = (i + r.nextDouble()) * this.radius / scene.shadowRays;
+                double s = (j + r.nextDouble()) * this.radius / scene.shadowRays;
                 originPoints[i][j] = this.position.add(u.mul(t)).add(v.mul(s));
             }
         }
@@ -59,25 +61,28 @@ public class Light {
                 }
             }
         }
-        double lightIntensity = (1-this.shadowIntensity) + this.shadowIntensity*(totalCollisions / (scene.shadowRays*scene.shadowRays));
-        return lightIntensity;
+        return (1 - this.shadowIntensity)
+                + this.shadowIntensity * (totalCollisions / (scene.shadowRays * scene.shadowRays));
     }
 
     /**
      * Calculates the RGB value of the light multiplier at a given point
-     * @param point the given point
-     * @param s The relevant scene
-     * @param specular Whether or not to calculate specular light; if true, multiplies each light by its' specular intensity
+     * 
+     * @param point    the given point
+     * @param scene    The relevant scene
+     * @param specular Whether or not to calculate specular light; if true,
+     *                 multiplies each light by its' specular intensity
      * @return The diffuse color multiplier.
      */
-    public static Vector LightAtPoint(Vector point, Scene s, boolean specular) {
+    public static Vector lightAtPoint(Vector point, Scene scene, boolean specular) {
         Vector ret = new Vector(1, 1, 1);
         double brightness = 1;
-        for (Light l: s.lights) {
+        for (Light l : scene.lights) {
             // Calculate brightness of light at point.
-            // brightness = dot(N, L) where N is the normal to the surface at point and L is the vector to the light
+            // brightness = dot(N, L) where N is the normal to the surface at point and L is
+            // the vector to the light
             Ray rayToPoint = new Ray(l.position, point);
-            Optional<SimpleImmutableEntry<Surface, Vector>> collision = rayToPoint.closestCollision(s);
+            Optional<SimpleImmutableEntry<Surface, Vector>> collision = rayToPoint.closestCollision(scene);
             if (collision.isPresent()) {
                 Surface obj = collision.get().getKey();
                 Vector collisionPoint = collision.get().getValue();
@@ -93,14 +98,15 @@ public class Light {
             }
             if (specular) {
                 // specular light(R, G, B) = Color*intensity*specularIntensity*(dot(N,L)^phong)
-                ret = ret.pointMult(l.color.mul(l.lightIntensity(point, s)).mul(l.specularIntensity).mul(brightness));
+                ret = ret.pointMult(
+                        l.color.mul(l.lightIntensity(point, scene)).mul(l.specularIntensity).mul(brightness));
             } else {
                 // diffuse light(R, G, B) = Color*intensity*dot(N,L)
-                ret = ret.pointMult(l.color.mul(l.lightIntensity(point, s)).mul(brightness));
+                ret = ret.pointMult(l.color.mul(l.lightIntensity(point, scene)).mul(brightness));
             }
-            
+
         }
         return ret;
     }
-    
+
 }
