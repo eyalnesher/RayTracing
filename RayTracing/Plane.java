@@ -1,6 +1,5 @@
 package RayTracing;
 
-import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Optional;
 
 public class Plane extends Surface {
@@ -18,13 +17,13 @@ public class Plane extends Surface {
     }
 
     @Override
-    public Optional<SimpleImmutableEntry<Vector, Vector>> intersection(Ray ray) {
+    public Optional<Pair<Vector, Vector>> intersection(Ray ray) {
         double denominator = this.normal.dot(ray.direction);
         if (Math.abs(denominator) > 0) {
             Vector diff = this.normal.mul(distance).sub(ray.origin);
             double length = diff.dot(this.normal);
             if (length >= 0) {
-                return Optional.of(new SimpleImmutableEntry<Vector, Vector>(ray.point(length), this.normal));
+                return Optional.of(new Pair<Vector, Vector>(ray.point(length), this.normal));
             }
         }
         return Optional.empty();

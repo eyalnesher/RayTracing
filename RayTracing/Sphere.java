@@ -1,6 +1,5 @@
 package RayTracing;
 
-import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Optional;
 
 public class Sphere extends Surface {
@@ -14,7 +13,7 @@ public class Sphere extends Surface {
     }
 
     @Override
-    public Optional<SimpleImmutableEntry<Vector, Vector>> intersection(Ray ray) {
+    public Optional<Pair<Vector, Vector>> intersection(Ray ray) {
 
         // Calculates the intersection of a ray and a sphere as seen in class
 
@@ -34,8 +33,7 @@ public class Sphere extends Surface {
 
         Vector intersectionPoint = ray.point(projection - Math.sqrt(squaredLength));
 
-        return Optional
-                .of(new SimpleImmutableEntry<Vector, Vector>(intersectionPoint, intersectionPoint.sub(this.center)));
+        return Optional.of(new Pair<Vector, Vector>(intersectionPoint, intersectionPoint.sub(this.center)));
     }
 
 }

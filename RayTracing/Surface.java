@@ -1,6 +1,5 @@
 package RayTracing;
 
-import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Optional;
 
 /**
@@ -21,5 +20,5 @@ public abstract class Surface {
      *         to the surface, if such an intersection exists.
      */
 
-    public abstract Optional<SimpleImmutableEntry<Vector, Vector>> intersection(Ray ray);
+    public abstract Optional<Pair<Vector, Vector>> intersection(Ray ray);
 }

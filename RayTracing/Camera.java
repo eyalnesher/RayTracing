@@ -1,6 +1,5 @@
 package RayTracing;
 
-import RayTracing.Vector;
 /**
  * An implementation of the camera, containing the camera parameters.
  */
