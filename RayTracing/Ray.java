@@ -16,25 +16,24 @@ public class Ray {
         this.direction = direction;
     }
 
-    public Optional<Pair<Surface, Vector>> closestCollision(Scene scene) {
-        Optional<Pair<Surface, Vector>> closestCollision = Optional.empty();
-        double distance = -1;
-        for (Surface obj : scene.sceneObjects) {
-            Optional<Pair<Vector, Vector>> current = obj.intersection(this);
-            if (current.isPresent()) {
-                Vector currentPoint = current.get().first();
-                if (distance < 0) {
-                    closestCollision = Optional.of(new Pair<>(obj, currentPoint));
-                }
-                double currDist = this.origin.distance(currentPoint);
-                if (currDist < distance) {
-                    closestCollision = Optional.of(new Pair<>(obj, currentPoint));
-                    distance = currDist;
-                }
-            }
-        }
-
-        return closestCollision;
+    /**
+     * Get the collision closest to the ray's origin.
+     * 
+     * @param scene The rendered scene.
+     * @return A triple consisting of the surface of the collision closest to the
+     *         origin, the point of intersection and the normal to the surface at
+     *         the point of intersection.
+     */
+    public Optional<Triple<Surface, Vector, Vector>> closestCollision(Scene scene) {
+        return scene.sceneObjects.stream()
+                .map((Surface surface) -> new Pair<Surface, Optional<Pair<Vector, Vector>>>(surface,
+                        surface.intersection(this)))
+                .filter((Pair<Surface, Optional<Pair<Vector, Vector>>> intersect) -> intersect.second().isPresent())
+                .map((Pair<Surface, Optional<Pair<Vector, Vector>>> intersect) -> new Triple<Surface, Vector, Vector>(
+                        intersect.first(), intersect.second().get()))
+                .min((Triple<Surface, Vector, Vector> intersection1,
+                        Triple<Surface, Vector, Vector> intersection2) -> this.origin
+                                .compareDistances(intersection1.second(), intersection2.second()));
     }
 
     /**
@@ -84,7 +83,7 @@ public class Ray {
             // Reached maximum recursion depth
             return s.bgColor;
         }
-        Optional<Pair<Surface, Vector>> collision = this.closestCollision(s);
+        Optional<Triple<Surface, Vector, Vector>> collision = this.closestCollision(s);
         if (!collision.isPresent()) {
             // Ray doesn't collide with anything, just veer off into the MAX_DOUBLE void
             return s.bgColor;

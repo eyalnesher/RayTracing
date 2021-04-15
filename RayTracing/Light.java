@@ -48,7 +48,7 @@ public class Light {
         for (int i = 0; i < scene.shadowRays; i++) {
             for (int j = 0; j < scene.shadowRays; j++) {
                 Ray lightRay = new Ray(originPoints[i][j], point);
-                Optional<Pair<Surface, Vector>> closestCollision = lightRay.closestCollision(scene);
+                Optional<Triple<Surface, Vector, Vector>> closestCollision = lightRay.closestCollision(scene);
                 if (closestCollision.isPresent()) {
                     if (point.equals(closestCollision.get().second())) {
                         totalCollisions += 1;
@@ -77,7 +77,7 @@ public class Light {
             // brightness = dot(N, L) where N is the normal to the surface at point and L is
             // the vector to the light
             Ray rayToPoint = new Ray(l.position, point);
-            Optional<Pair<Surface, Vector>> collision = rayToPoint.closestCollision(scene);
+            Optional<Triple<Surface, Vector, Vector>> collision = rayToPoint.closestCollision(scene);
             if (collision.isPresent()) {
                 Surface obj = collision.get().first();
                 Vector collisionPoint = collision.get().second();
