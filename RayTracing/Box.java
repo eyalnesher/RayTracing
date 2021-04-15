@@ -132,9 +132,9 @@ public class Box extends Surface {
             }
         }
 
-        return intersections.stream().max((Pair<Vector, Vector> intersection1,
-                Pair<Vector, Vector> intersection2) -> ((Double) intersection1.first().squaredDistance(ray.origin))
-                        .compareTo((Double) intersection1.first().squaredDistance(ray.origin)));
+        return intersections.stream()
+                .max((Pair<Vector, Vector> intersection1, Pair<Vector, Vector> intersection2) -> ray.origin
+                        .compareDistances(intersection1.first(), intersection2.first()));
 
     }
 }
