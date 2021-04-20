@@ -100,20 +100,20 @@ public class RayTracer {
 						cam = new Camera(new Vector(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2])),
 									new Vector(Double.parseDouble(params[3]), Double.parseDouble(params[4]), Double.parseDouble(params[5])),
 									new Vector(Double.parseDouble(params[6]),Double.parseDouble(params[7]), Double.parseDouble(params[8])),
-									Double.parseDouble(params[9]), Double.parseDouble(params[10]),
+									Double.parseDouble(params[9]), Double.parseDouble(params[10]), (double)this.imageHeight/this.imageWidth,
 									Boolean.parseBoolean(params[11]),
 									Double.parseDouble(params[12]));
 					} else if (params.length == 12) {
 						cam = new Camera(new Vector(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2])),
 									new Vector(Double.parseDouble(params[3]), Double.parseDouble(params[4]), Double.parseDouble(params[5])),
 									new Vector(Double.parseDouble(params[6]),Double.parseDouble(params[7]), Double.parseDouble(params[8])),
-									Double.parseDouble(params[9]), Double.parseDouble(params[10]),
+									Double.parseDouble(params[9]), Double.parseDouble(params[10]), (double)this.imageHeight/this.imageWidth,
 									Boolean.parseBoolean(params[11]));
 					} else {
 						cam = new Camera(new Vector(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2])),
 									new Vector(Double.parseDouble(params[3]), Double.parseDouble(params[4]), Double.parseDouble(params[5])),
 									new Vector(Double.parseDouble(params[6]),Double.parseDouble(params[7]), Double.parseDouble(params[8])),
-									Double.parseDouble(params[9]), Double.parseDouble(params[10]));
+									Double.parseDouble(params[9]), Double.parseDouble(params[10]), (double)this.imageHeight/this.imageWidth);
 					}
 					
 					System.out.println(String.format("Parsed camera parameters (line %d)", lineNum));
@@ -146,7 +146,7 @@ public class RayTracer {
 					*/
 					scene.addObject(new Sphere(new Vector(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2])),
 									Double.parseDouble(params[3]),
-									materials.get(Integer.parseInt(params[4]))));
+									materials.get(Integer.parseInt(params[4])-1)));
 					System.out.println(String.format("Parsed sphere (line %d)", lineNum));
 				} else if (code.equals("pln")) {
 					/*
@@ -154,7 +154,7 @@ public class RayTracer {
 					*/
 					scene.addObject(new Plane(new Vector(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2])),
 									Double.parseDouble(params[3]),
-									materials.get(Integer.parseInt(params[4]))));
+									materials.get(Integer.parseInt(params[4])-1)));
 					System.out.println(String.format("Parsed plane (line %d)", lineNum));
 				} else if (code.equals("lgt")) {
 					/*
@@ -174,7 +174,7 @@ public class RayTracer {
 					*/
 					scene.addObject(new Box(new Vector(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2])),
 											Double.parseDouble(params[3]),
-											materials.get(Integer.parseInt(params[4]))));
+											materials.get(Integer.parseInt(params[4])-1)));
 				}else {
 					System.out.println(String.format("ERROR: Did not recognize object: %s (line %d)", code, lineNum));
 				}
@@ -207,12 +207,12 @@ public class RayTracer {
 		// Each of the red, green and blue components should be a byte, i.e. 0-255
 		for (int y = 0; y < this.imageHeight; y++) {
 			for (int x = 0; x < this.imageWidth; x++) {
-				Ray pixelRay = s.camera.pixelRay(this.imageWidth, this.imageHeight, x, y);
+				Ray pixelRay = s.camera.pixelRay((double)x/this.imageWidth, (double)y/this.imageHeight);
 				Vector pixelColor = pixelRay.trace(s);
-
 				rgbData[(y*this.imageWidth + x)*3] = (byte)(255*pixelColor.x);
 				rgbData[(y*this.imageWidth + x)*3 + 1] = (byte)(255*pixelColor.y);
 				rgbData[(y*this.imageWidth + x)*3 + 2] = (byte)(255*pixelColor.z);
+				// System.out.println("Put value (" + pixelColor.x + ", " + pixelColor.y + ", " + pixelColor.z + ") in (" + x + "," + y + ")");
 			}
 		}
 		long endTime = System.currentTimeMillis();

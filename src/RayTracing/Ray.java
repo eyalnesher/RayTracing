@@ -13,7 +13,7 @@ public class Ray {
 
     public Ray(Vector origin, Vector direction) {
         this.origin = origin;
-        this.direction = direction;
+        this.direction = direction.normalize();
     }
 
     /**
@@ -110,10 +110,10 @@ public class Ray {
         // Output = (Mdiff*Ldiff + Mspec*Lspec)(1-transparency) + bgColor*transperency +
         // Mreflect*(reflectedColor)
         // Start with the non-reflection values that we know:
-        Vector baseOutput = surface.material.diffuse.pointMult(Light.lightAtPoint(point, scene, false));
-        baseOutput = baseOutput.add(surface.material.specular.pointMult(Light.lightAtPoint(point, scene, true)));
-        baseOutput = baseOutput.mul(1 - surface.material.transparency);
-        baseOutput = baseOutput.add(scene.bgColor.mul(surface.material.transparency));
+        Vector baseOutput = surface.material.diffuse.pointMult(Light.lightAtPoint(point, scene, false))
+        .add(surface.material.specular.pointMult(Light.lightAtPoint(point, scene, true)))
+        .mul(1 - surface.material.transparency)
+        .add(scene.bgColor.mul(surface.material.transparency));
 
         Vector normal = collision.get().third();
 

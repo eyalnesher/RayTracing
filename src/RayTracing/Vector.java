@@ -144,4 +144,11 @@ public class Vector {
         return ((Double) this.squaredDistance(u)).compareTo((Double) this.squaredDistance(v));
     }
 
+    /**
+     * Returns a normalized form of the given vector
+     */
+    public Vector normalize() {
+        return this.mul(1/Math.sqrt(this.dot(this)));
+    }
+
 }
