@@ -74,6 +74,9 @@ public class RayTracer {
 		int lineNum = 0;
 		System.out.println("Started parsing scene file " + sceneFileName);
 
+		Camera cam = null;
+		Scene scene = null;
+		List<Material> materials = new ArrayList<>();
 		while ((line = r.readLine()) != null) {
 			line = line.trim();
 			++lineNum;
@@ -86,36 +89,93 @@ public class RayTracer {
 				String[] params = line.substring(3).trim().toLowerCase().split("\\s+");
 
 				if (code.equals("cam")) {
-					// Add code here to parse camera parameters
-
+					/*
+					* Camera input format: 0:pos(x) 1:pos(y) 2:pos(z)
+					*						3:lookat(x) 4:lookat(y) 5:lookat(z)
+					*						6:up(x) 7:up(y) 8:up(z)
+					*						9:screenDistance 10:screenWidth
+					*						11:fisheye(optional) 12:fisheyeParam(optional)
+					*/
+					if (params.length >= 13) {
+						cam = new Camera(new Vector(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2])),
+									new Vector(Double.parseDouble(params[3]), Double.parseDouble(params[4]), Double.parseDouble(params[5])),
+									new Vector(Double.parseDouble(params[6]),Double.parseDouble(params[7]), Double.parseDouble(params[8])),
+									Double.parseDouble(params[9]), Double.parseDouble(params[10]),
+									Boolean.parseBoolean(params[11]),
+									Double.parseDouble(params[12]));
+					} else if (params.length == 12) {
+						cam = new Camera(new Vector(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2])),
+									new Vector(Double.parseDouble(params[3]), Double.parseDouble(params[4]), Double.parseDouble(params[5])),
+									new Vector(Double.parseDouble(params[6]),Double.parseDouble(params[7]), Double.parseDouble(params[8])),
+									Double.parseDouble(params[9]), Double.parseDouble(params[10]),
+									Boolean.parseBoolean(params[11]));
+					} else {
+						cam = new Camera(new Vector(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2])),
+									new Vector(Double.parseDouble(params[3]), Double.parseDouble(params[4]), Double.parseDouble(params[5])),
+									new Vector(Double.parseDouble(params[6]),Double.parseDouble(params[7]), Double.parseDouble(params[8])),
+									Double.parseDouble(params[9]), Double.parseDouble(params[10]));
+					}
+					
 					System.out.println(String.format("Parsed camera parameters (line %d)", lineNum));
 				} else if (code.equals("set")) {
-					// Add code here to parse general settings parameters
-
+					/*
+					* Scene input format: 0:bgColor(r) 1:bgColor(g) 2:bgColor(b) 3:shadowRays 4:recursionDepth
+					*/
+					scene = new Scene(new Vector(Double.parseDouble(params[0]), Double.parseDouble(params[1]),Double.parseDouble(params[2])),
+									Integer.parseInt(params[3]), Integer.parseInt(params[4]),
+									cam,
+									new ArrayList<Surface>(), new ArrayList<Light>());
 					System.out.println(String.format("Parsed general settings (line %d)", lineNum));
 				} else if (code.equals("mtl")) {
-					// Add code here to parse material parameters
+					/*
+					* Material input format: 0:diffuse(r) 1:diffuse(g) 2:diffuse(b) 
+					*						3:specular(r) 4:specular(g) 5:specular(b)
+					*						6:reflection(r) 7:reflection(g) 8:reflection(b)
+					*						9:phong 10:transparency
+					*/
+						materials.add(new Material(new Vector(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2])),
+												new Vector(Double.parseDouble(params[3]), Double.parseDouble(params[4]), Double.parseDouble(params[5])),
+												Double.parseDouble(params[9]),
+												new Vector(Double.parseDouble(params[6]), Double.parseDouble(params[7]), Double.parseDouble(params[8])),
+												Double.parseDouble(params[10])));
 
 					System.out.println(String.format("Parsed material (line %d)", lineNum));
 				} else if (code.equals("sph")) {
-					// Add code here to parse sphere parameters
-
-					// Example (you can implement this in many different ways!):
-					// Sphere sphere = new Sphere();
-					// sphere.setCenter(params[0], params[1], params[2]);
-					// sphere.setRadius(params[3]);
-					// sphere.setMaterial(params[4]);
-
+					/*
+					* Sphere input format: 0:pos(x) 1:pos(y) 2:pos(z) 3:radius 4:mat_index
+					*/
+					scene.addObject(new Sphere(new Vector(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2])),
+									Double.parseDouble(params[3]),
+									materials.get(Integer.parseInt(params[4]))));
 					System.out.println(String.format("Parsed sphere (line %d)", lineNum));
 				} else if (code.equals("pln")) {
-					// Add code here to parse plane parameters
-
+					/*
+					* Plane input format: 0:pos(x) 1:pos(y) 2:pos(z) 3:offset 4:mat_index
+					*/
+					scene.addObject(new Plane(new Vector(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2])),
+									Double.parseDouble(params[3]),
+									materials.get(Integer.parseInt(params[4]))));
 					System.out.println(String.format("Parsed plane (line %d)", lineNum));
 				} else if (code.equals("lgt")) {
-					// Add code here to parse light parameters
-
+					/*
+					* Light input format: 0:pos(x) 1:pos(y) 2:pos(z)
+					*						3:r 4:g 5:b
+					*						6:specular 7:shadow 8: radius
+					*/
+					scene.addLight(new Light(new Vector(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2])),
+									new Vector(Double.parseDouble(params[3]), Double.parseDouble(params[4]), Double.parseDouble(params[5])),
+									Double.parseDouble(params[6]),
+									Double.parseDouble(params[7]),
+									Double.parseDouble(params[8])));
 					System.out.println(String.format("Parsed light (line %d)", lineNum));
-				} else {
+				} else if (code.equals("box")){
+					/*
+					* Box input format: 0:pos(x) 1:pos(y) 2:pos(z) 3:length 4:mat_index
+					*/
+					scene.addObject(new Box(new Vector(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2])),
+											Double.parseDouble(params[3]),
+											materials.get(Integer.parseInt(params[4]))));
+				}else {
 					System.out.println(String.format("ERROR: Did not recognize object: %s (line %d)", code, lineNum));
 				}
 			}
