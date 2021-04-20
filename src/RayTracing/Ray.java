@@ -117,7 +117,7 @@ public class Ray {
 
         Vector normal = collision.get().third();
 
-        Ray reflectedRay = new Ray(point, point.sub(normal.mul(2 * point.dot(normal))));
+        Ray reflectedRay = new Ray(point.add(normal.mul(0.00000001)), point.sub(normal.mul(2 * point.dot(normal))));
         // Add the Mreflect*(reflectedColor) part:
         return baseOutput.add(surface.material.reflection.pointMult(reflectedRay.trace(scene, recursionDepth + 1)));
     }

@@ -35,5 +35,4 @@ public class Sphere extends Surface {
 
         return Optional.of(new Pair<Vector, Vector>(intersectionPoint, intersectionPoint.sub(this.center)));
     }
-
 }

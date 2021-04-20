@@ -20,7 +20,7 @@ public class Camera {
             double fisheye_param) {
         this.position = pos;
         this.towards = lookAt.sub(pos).normalize();
-        this.right = this.towards.cross(up).neg();
+        this.right = this.towards.cross(up).normalize();
         this.upVector = fixUpVector(up, this.towards, this.right);
         this.screenDist = screenDist;
         this.screenWidth = screenWidth;
@@ -46,15 +46,15 @@ public class Camera {
      *         `up`
      */
     private static Vector fixUpVector(Vector up, Vector towards, Vector right) {
-        Vector fixed = right.cross(towards);
+        Vector fixed = right.cross(towards).normalize();
         return Stream.of(fixed, fixed.neg()).min((u, v) -> up.compareDistances(u, v)).get();
     }
 
     public Ray pixelRay(double x, double y) {
-        Vector py = this.position.add(this.towards.mul(this.screenDist)).sub(this.upVector.mul(this.screenHeight/2));
-        Vector px = this.position.add(this.towards.mul(this.screenDist)).sub(right.mul(this.screenWidth/2));
-        Vector P = py.add(this.upVector.mul(screenHeight*(y/screenHeight +0.5)))
-        .add(px.add(right.mul(this.screenWidth*(x/this.screenWidth +0.5))));
+        Vector py = this.position.add(this.towards.mul(this.screenDist)).add(this.upVector.mul(this.screenHeight/2));
+        Vector px = this.position.add(this.towards.mul(this.screenDist)).add(right.mul(this.screenWidth/2));
+        Vector P = py.sub(this.upVector.mul(y + this.screenHeight*0.5))
+        .add(px.sub(right.mul(x + this.screenWidth*0.5)));
         Ray pixelRay = new Ray(this.position, P.sub(position).normalize());
         return pixelRay;
     }

@@ -200,14 +200,14 @@ public class RayTracer {
 		// Put your ray tracing code here!
 		//
 		// Write pixel color values in RGB format to rgbData:
-		// Pixel [x, y] red component is in rgbData[(y * this.imageWidth + x) * 3]
+		// Pixel [x, y] red component is in rgbData[(y * this.image\Width + x) * 3]
 		// green component is in rgbData[(y * this.imageWidth + x) * 3 + 1]
 		// blue component is in rgbData[(y * this.imageWidth + x) * 3 + 2]
 		//
 		// Each of the red, green and blue components should be a byte, i.e. 0-255
 		for (int y = 0; y < this.imageHeight; y++) {
 			for (int x = 0; x < this.imageWidth; x++) {
-				Ray pixelRay = s.camera.pixelRay((double)x/this.imageWidth, (double)y/this.imageHeight);
+				Ray pixelRay = s.camera.pixelRay(((double)x)/this.imageWidth - 0.5, ((double)y)/this.imageHeight - 0.5);
 				Vector pixelColor = pixelRay.trace(s);
 				rgbData[(y*this.imageWidth + x)*3] = (byte)(255*pixelColor.x);
 				rgbData[(y*this.imageWidth + x)*3 + 1] = (byte)(255*pixelColor.y);

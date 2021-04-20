@@ -125,7 +125,7 @@ public class Vector {
             return false;
         }
         Vector vector = (Vector) other;
-        if ((this.x == vector.x) && (this.y == vector.y) && (this.z == vector.z)) {
+        if (this.squaredDistance(vector) < 0.0000000001) {
             return true;
         } else {
             return false;
