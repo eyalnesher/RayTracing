@@ -35,10 +35,10 @@ public class Light {
                                                                                   // which we shoot rays at the target.
         Random r = new Random();
 
-        for (int i = -scene.shadowRays / 2; i < (scene.shadowRays / 2); i++) {
-            for (int j = -scene.shadowRays / 2; j < (scene.shadowRays / 2); j++) {
-                double t = (i + r.nextDouble()) * this.radius / scene.shadowRays;
-                double s = (j + r.nextDouble()) * this.radius / scene.shadowRays;
+        for (int i = 0; i < scene.shadowRays; i++) {
+            for (int j = 0; j < scene.shadowRays; j++) {
+                double t = (i + r.nextDouble()-(scene.shadowRays / 2)) * this.radius / scene.shadowRays;
+                double s = (j + r.nextDouble()-(scene.shadowRays / 2)) * this.radius / scene.shadowRays;
                 originPoints[i][j] = this.position.add(u.mul(t)).add(v.mul(s));
             }
         }

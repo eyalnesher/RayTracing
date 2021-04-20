@@ -45,4 +45,19 @@ public class Camera {
         Vector fixed = up.cross(lookAt).cross(lookAt);
         return Stream.of(fixed, fixed.neg()).min((u, v) -> up.compareDistances(u, v)).get();
     }
+
+    public Ray pixelRay(int imageWidth, int imageHeight, int x, int y) {
+        Vector xAxisVector = this.lookAt.cross(this.upVector);
+        Vector pixel = this.position.add(
+            this.lookAt.sub(this.position)
+            .mul(1/Math.sqrt(this.lookAt.sub(this.position).dot(this.lookAt.sub(this.position))))
+            .mul(this.screenDist))
+				.add(xAxisVector.mul((double)(x-(imageWidth/2))/imageWidth))
+				.add(this.upVector.mul((double)(y-(imageHeight/2))/imageHeight));
+        if (this.fisheye) {
+            // TODO: Apply fisheye transformation on pixel location
+        }
+        Ray pixelRay = new Ray(this.position, pixel);
+        return pixelRay;
+    }
 }

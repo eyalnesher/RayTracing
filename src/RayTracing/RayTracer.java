@@ -183,7 +183,7 @@ public class RayTracer {
 
 		// It is recommended that you check here that the scene is valid,
 		// for example camera settings and all necessary materials were defined.
-
+		r.close();
 		System.out.println("Finished parsing scene file " + sceneFileName);
 		return scene;
 	}
@@ -205,7 +205,16 @@ public class RayTracer {
 		// blue component is in rgbData[(y * this.imageWidth + x) * 3 + 2]
 		//
 		// Each of the red, green and blue components should be a byte, i.e. 0-255
+		for (int y = 0; y < this.imageHeight; y++) {
+			for (int x = 0; x < this.imageWidth; x++) {
+				Ray pixelRay = s.camera.pixelRay(this.imageWidth, this.imageHeight, x, y);
+				Vector pixelColor = pixelRay.trace(s);
 
+				rgbData[(y*this.imageWidth + x)*3] = (byte)(255*pixelColor.x);
+				rgbData[(y*this.imageWidth + x)*3 + 1] = (byte)(255*pixelColor.y);
+				rgbData[(y*this.imageWidth + x)*3 + 2] = (byte)(255*pixelColor.z);
+			}
+		}
 		long endTime = System.currentTimeMillis();
 		Long renderTime = endTime - startTime;
 

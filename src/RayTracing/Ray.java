@@ -67,7 +67,23 @@ public class Ray {
      *         hits.
      */
     public Vector trace(Scene s) {
-        return this.trace(s, 0);
+        Vector ret = this.trace(s, 0);
+        if (ret.x > 1) {
+            ret = new Vector(1, ret.y, ret.z);
+        } else if (ret.x < 0) {
+            ret = new Vector(0, ret.y, ret.z);
+        }
+        if (ret.y > 1) {
+            ret = new Vector(ret.x, 1, ret.z);
+        } else if (ret.y < 0) {
+            ret = new Vector(ret.x, 0, ret.z);
+        }
+        if (ret.z > 1) {
+            ret = new Vector(ret.x, ret.y, 1);
+        } else if (ret.z < 0) {
+            ret = new Vector(ret.x, ret.y, 0);
+        }
+        return ret;
     }
 
     /**
