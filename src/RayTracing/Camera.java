@@ -1,6 +1,5 @@
 package RayTracing;
 
-import java.util.Arrays;
 import java.util.stream.Stream;
 
 /**
@@ -15,7 +14,8 @@ public class Camera {
     public final boolean fisheye;
     public final double fisheye_param;
 
-    public Camera(Vector pos, Vector lookAt, Vector up, double screenDist, double screenWidth, boolean fisheye, double fisheye_param) {
+    public Camera(Vector pos, Vector lookAt, Vector up, double screenDist, double screenWidth, boolean fisheye,
+            double fisheye_param) {
         this.position = pos;
         this.lookAt = lookAt;
         this.upVector = fixUpVector(up, lookAt);

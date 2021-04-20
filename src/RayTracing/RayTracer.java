@@ -146,7 +146,7 @@ public class RayTracer {
 					*/
 					scene.addObject(new Sphere(new Vector(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2])),
 									Double.parseDouble(params[3]),
-									materials.get(Integer.parseInt(params[4])-1)));
+									materials.get(Integer.parseInt(params[4]))));
 					System.out.println(String.format("Parsed sphere (line %d)", lineNum));
 				} else if (code.equals("pln")) {
 					/*
@@ -154,7 +154,7 @@ public class RayTracer {
 					*/
 					scene.addObject(new Plane(new Vector(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2])),
 									Double.parseDouble(params[3]),
-									materials.get(Integer.parseInt(params[4])-1)));
+									materials.get(Integer.parseInt(params[4]))));
 					System.out.println(String.format("Parsed plane (line %d)", lineNum));
 				} else if (code.equals("lgt")) {
 					/*
@@ -174,7 +174,7 @@ public class RayTracer {
 					*/
 					scene.addObject(new Box(new Vector(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2])),
 											Double.parseDouble(params[3]),
-											materials.get(Integer.parseInt(params[4])-1)));
+											materials.get(Integer.parseInt(params[4]))));
 				}else {
 					System.out.println(String.format("ERROR: Did not recognize object: %s (line %d)", code, lineNum));
 				}
