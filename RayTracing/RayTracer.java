@@ -47,10 +47,10 @@ public class RayTracer {
 			}
 
 			// Parse scene file:
-			tracer.parseScene(sceneFileName);
+			Scene scene = tracer.parseScene(sceneFileName);
 
 			// Render scene:
-			tracer.renderScene(outputFileName);
+			tracer.renderScene(scene, outputFileName);
 
 			// } catch (IOException e) {
 			// System.out.println(e.getMessage());
@@ -66,7 +66,7 @@ public class RayTracer {
 	 * Parses the scene file and creates the scene. Change this function so it
 	 * generates the required objects.
 	 */
-	public void parseScene(String sceneFileName) throws IOException, RayTracerException {
+	public Scene parseScene(String sceneFileName) throws IOException, RayTracerException {
 		FileReader fr = new FileReader(sceneFileName);
 
 		BufferedReader r = new BufferedReader(fr);
@@ -185,13 +185,13 @@ public class RayTracer {
 		// for example camera settings and all necessary materials were defined.
 
 		System.out.println("Finished parsing scene file " + sceneFileName);
-
+		return scene;
 	}
 
 	/**
 	 * Renders the loaded scene and saves it to the specified file location.
 	 */
-	public void renderScene(String outputFileName) {
+	public void renderScene(Scene s, String outputFileName) {
 		long startTime = System.currentTimeMillis();
 
 		// Create a byte array to hold the pixel data:
