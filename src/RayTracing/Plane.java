@@ -8,7 +8,7 @@ public class Plane extends Surface {
 
     public Plane(Vector normal, double distance, Material material) {
         super(material);
-        this.normal = normal;
+        this.normal = normal.normalize();
         this.distance = distance;
     }
 
