@@ -24,6 +24,22 @@ public class Box extends Surface {
         private Axis(Vector axis) {
             this.axis = axis;
         }
+
+        public double pointAxis(Vector point) {
+            switch (this) {
+            case X: {
+                return point.x;
+            }
+            case Y: {
+                return point.y;
+            }
+            default: {
+                // case Z:
+                return point.z;
+            }
+
+            }
+        }
     }
 
     /**
@@ -33,23 +49,7 @@ public class Box extends Surface {
      * @return The planes which extend the two faces perpendicular to `axis`.
      */
     private Pair<Plane, Plane> faces(Axis axis) {
-        double position = 0;
-
-        switch (axis) {
-        case X: {
-            position = this.position.x;
-            break;
-        }
-        case Y: {
-            position = this.position.x;
-            break;
-        }
-        case Z: {
-            position = this.position.x;
-            break;
-        }
-
-        }
+        double position = axis.pointAxis(this.position);
 
         return new Pair<Plane, Plane>(new Plane(axis.axis, position - this.length / 2, this.material),
                 new Plane(axis.axis, position + this.length / 2, this.material));
@@ -66,22 +66,7 @@ public class Box extends Surface {
      *         `axis` axis.
      */
     private double distanceFromAxis(Vector point, Axis axis) {
-        double distance = 0;
-        switch (axis) {
-        case X: {
-            distance = point.y - this.position.y;
-        }
-        case Y: {
-            distance = point.y - this.position.y;
-            break;
-        }
-        case Z: {
-            distance = point.y - this.position.y;
-            break;
-        }
-
-        }
-        return Math.abs(distance);
+        return Math.abs(axis.pointAxis(point) - axis.pointAxis(this.position));
     }
 
     /**
@@ -98,9 +83,9 @@ public class Box extends Surface {
      * @return If the point is in the bounds of the faces defined by `axis`.
      */
     private boolean inFaceBounds(Vector point, Axis axis) {
-        boolean xBounds = distanceFromAxis(point, Axis.X) < this.length / 2;
-        boolean yBounds = distanceFromAxis(point, Axis.Y) < this.length / 2;
-        boolean zBounds = distanceFromAxis(point, Axis.Z) < this.length / 2;
+        boolean xBounds = distanceFromAxis(point, Axis.X) <= this.length / 2;
+        boolean yBounds = distanceFromAxis(point, Axis.Y) <= this.length / 2;
+        boolean zBounds = distanceFromAxis(point, Axis.Z) <= this.length / 2;
 
         switch (axis) {
         case X: {
@@ -124,16 +109,16 @@ public class Box extends Surface {
             Pair<Plane, Plane> faces = this.faces(axis);
             Optional<Pair<Vector, Vector>> intersection1 = faces.first().intersection(ray);
             Optional<Pair<Vector, Vector>> intersection2 = faces.second().intersection(ray);
-            if (!intersection1.isEmpty() && this.inFaceBounds(intersection1.get().first(), axis)) {
+            if (intersection1.isPresent() && this.inFaceBounds(intersection1.get().first(), axis)) {
                 intersections.add(intersection1.get());
             }
-            if (!intersection2.isEmpty() && this.inFaceBounds(intersection1.get().first(), axis)) {
+            if (intersection2.isPresent() && this.inFaceBounds(intersection2.get().first(), axis)) {
                 intersections.add(intersection2.get());
             }
         }
 
         return intersections.stream()
-                .max((Pair<Vector, Vector> intersection1, Pair<Vector, Vector> intersection2) -> ray.origin
+                .min((Pair<Vector, Vector> intersection1, Pair<Vector, Vector> intersection2) -> ray.origin
                         .compareDistances(intersection1.first(), intersection2.first()));
 
     }
