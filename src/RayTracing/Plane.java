@@ -1,6 +1,7 @@
 package RayTracing;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class Plane extends Surface {
     private Vector normal;
@@ -23,7 +24,9 @@ public class Plane extends Surface {
             Vector diff = this.normal.mul(distance).sub(ray.origin);
             double length = diff.dot(this.normal) / denominator;
             if (length >= 0) {
-                return Optional.of(new Pair<Vector, Vector>(ray.point(length), this.normal));
+                Vector normal = Stream.of(this.normal, this.normal.neg())
+                        .min((u, v) -> ray.origin.compareDistances(u, v)).get();
+                return Optional.of(new Pair<Vector, Vector>(ray.point(length), normal));
             }
         }
         return Optional.empty();
