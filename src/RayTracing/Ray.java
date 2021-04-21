@@ -25,15 +25,16 @@ public class Ray {
      *         the point of intersection.
      */
     public Optional<Triple<Surface, Vector, Vector>> closestCollision(Scene scene) {
-        return scene.sceneObjects.stream()
-                .map((Surface surface) -> new Pair<Surface, Optional<Pair<Vector, Vector>>>(surface,
-                        surface.intersection(this)))
+        return scene.sceneObjects.stream().map((Surface surface) -> new Pair<>(surface, surface.intersection(this)))
                 .filter((Pair<Surface, Optional<Pair<Vector, Vector>>> intersect) -> intersect.second().isPresent())
-                .map((Pair<Surface, Optional<Pair<Vector, Vector>>> intersect) -> new Triple<Surface, Vector, Vector>(
-                        intersect.first(), intersect.second().get()))
+                .map((Pair<Surface, Optional<Pair<Vector, Vector>>> intersect) -> new Triple<>(intersect.first(),
+                        intersect.second().get()))
                 .min((Triple<Surface, Vector, Vector> intersection1,
                         Triple<Surface, Vector, Vector> intersection2) -> this.origin
-                                .compareDistances(intersection1.second(), intersection2.second()));
+                                .compareDistances(intersection1.second(), intersection2.second()))
+                .map((Triple<Surface, Vector, Vector> intersection) -> (intersection.third().dot(this.direction) > 0)
+                        ? new Triple<>(intersection.first(), intersection.second(), intersection.third().neg())
+                        : intersection);
     }
 
     /**
@@ -106,16 +107,14 @@ public class Ray {
         }
         Surface surface = collision.get().first();
         Vector point = collision.get().second();
+        Vector normal = collision.get().third();
 
         // Output = (Mdiff*Ldiff + Mspec*Lspec)(1-transparency) + bgColor*transperency +
         // Mreflect*(reflectedColor)
         // Start with the non-reflection values that we know:
-        Vector baseOutput = surface.material.diffuse.pointMult(Light.lightAtPoint(point, scene, false))
-        .add(surface.material.specular.pointMult(Light.lightAtPoint(point, scene, true)))
-        .mul(1 - surface.material.transparency)
-        .add(scene.bgColor.mul(surface.material.transparency));
-
-        Vector normal = collision.get().third();
+        Vector baseOutput = surface.material.diffuse.pointMult(Light.lightAtPoint(scene, surface, point, normal, false))
+                .add(surface.material.specular.pointMult(Light.lightAtPoint(scene, surface, point, normal, true)))
+                .mul(1 - surface.material.transparency).add(scene.bgColor.mul(surface.material.transparency));
 
         Ray reflectedRay = new Ray(point.add(normal.mul(0.00000001)), point.sub(normal.mul(2 * point.dot(normal))));
         // Add the Mreflect*(reflectedColor) part:

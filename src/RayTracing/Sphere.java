@@ -20,9 +20,9 @@ public class Sphere extends Surface {
         Vector diff = this.center.sub(ray.origin);
         double projection = diff.dot(ray.direction);
 
-        if (projection < 0) {
-            return Optional.empty();
-        }
+        // if (projection < 0) {
+        // return Optional.empty();
+        // }
 
         double squaredDistance = diff.dot(diff) - projection * projection;
 
@@ -31,8 +31,16 @@ public class Sphere extends Surface {
             return Optional.empty();
         }
 
-        Vector intersectionPoint = ray.point(projection - Math.sqrt(squaredLength));
+        double length = Math.sqrt(squaredLength);
+        double offset = projection - length;
+        if (offset < 0) {
+            offset = projection + length;
+            if (offset < 0) {
+                return Optional.empty();
+            }
+        }
+        Vector intersectionPoint = ray.point(offset);
 
-        return Optional.of(new Pair<Vector, Vector>(intersectionPoint, intersectionPoint.sub(this.center)));
+        return Optional.of(new Pair<Vector, Vector>(intersectionPoint, intersectionPoint.sub(this.center).normalize()));
     }
 }
