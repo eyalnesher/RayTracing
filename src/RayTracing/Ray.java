@@ -112,9 +112,15 @@ public class Ray {
         // Output = (Mdiff*Ldiff + Mspec*Lspec)(1-transparency) + bgColor*transperency +
         // Mreflect*(reflectedColor)
         // Start with the non-reflection values that we know:
+        Vector backgroundColor = scene.bgColor;
+        if (surface.material.transparency > 0) {
+            Ray transparentRay = new Ray(point.add(this.direction.mul(0.00000001)), this.direction);
+            backgroundColor = transparentRay.trace(scene, recursionDepth + 1);
+        }
+
         Vector baseOutput = surface.material.diffuse.pointMult(Light.lightAtPoint(scene, surface, point, normal, false))
                 .add(surface.material.specular.pointMult(Light.lightAtPoint(scene, surface, point, normal, true)))
-                .mul(1 - surface.material.transparency).add(scene.bgColor.mul(surface.material.transparency));
+                .mul(1 - surface.material.transparency).add(backgroundColor.mul(surface.material.transparency));
 
         Ray reflectedRay = new Ray(point.add(normal.mul(0.00000001)), this.direction.neg().reflect(normal));
         // Add the Mreflect*(reflectedColor) part:
