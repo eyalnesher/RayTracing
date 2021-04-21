@@ -52,8 +52,12 @@ public class Light {
 
         for (int i = 0; i < scene.shadowRays; i++) {
             for (int j = 0; j < scene.shadowRays; j++) {
-                double t = (i + r.nextDouble() - (scene.shadowRays / 2)) * this.radius / scene.shadowRays;
-                double s = (j + r.nextDouble() - (scene.shadowRays / 2)) * this.radius / scene.shadowRays;
+                // double t = (i + r.nextDouble() - (scene.shadowRays / 2.0)) * this.radius /
+                // scene.shadowRays;
+                // double s = (j + r.nextDouble() - (scene.shadowRays / 2.0)) * this.radius /
+                // scene.shadowRays;
+                double t = ((i + r.nextDouble()) / scene.shadowRays - 0.5) * this.radius;
+                double s = ((j + r.nextDouble()) / scene.shadowRays - 0.5) * this.radius;
                 originPoints[i][j] = this.position.add(u.mul(t)).add(v.mul(s));
             }
         }
@@ -99,8 +103,8 @@ public class Light {
                 // brightness = dot(R, V) where R is the ray's reflection from the surface at
                 // point and V is the vector to the camera
                 // specular light(R, G, B) = Color*intensity*specularIntensity*(dot(N,L)^phong)
-                Vector reflection = normal.mul(2 * lightVector.dot(normal)).normalize().sub(lightVector);
-                double brightness = Math.pow((reflection.dot(scene.camera.position.sub(point).normalize())),
+                double brightness = Math.pow(
+                        (lightVector.reflect(normal).dot(scene.camera.position.sub(point).normalize())),
                         surface.material.phong);
                 baseLight = baseLight.mul(light.specularIntensity * brightness);
             } else {

@@ -116,7 +116,7 @@ public class Ray {
                 .add(surface.material.specular.pointMult(Light.lightAtPoint(scene, surface, point, normal, true)))
                 .mul(1 - surface.material.transparency).add(scene.bgColor.mul(surface.material.transparency));
 
-        Ray reflectedRay = new Ray(point.add(normal.mul(0.00000001)), point.sub(normal.mul(2 * point.dot(normal))));
+        Ray reflectedRay = new Ray(point.add(normal.mul(0.00000001)), this.direction.neg().reflect(normal));
         // Add the Mreflect*(reflectedColor) part:
         return baseOutput.add(surface.material.reflection.pointMult(reflectedRay.trace(scene, recursionDepth + 1)));
     }

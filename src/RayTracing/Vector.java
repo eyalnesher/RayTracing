@@ -148,7 +148,11 @@ public class Vector {
      * Returns a normalized form of the given vector
      */
     public Vector normalize() {
-        return this.mul(1/Math.sqrt(this.dot(this)));
+        return this.mul(1 / Math.sqrt(this.dot(this)));
+    }
+
+    public Vector reflect(Vector normal) {
+        return normal.mul(2 * this.dot(normal)).sub(this);
     }
 
 }
