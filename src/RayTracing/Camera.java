@@ -53,11 +53,7 @@ public class Camera {
 
     public Ray pixelRay(double x, double y) {
         Vector center = this.position.add(this.towards.mul(this.screenDist));
-        // Vector py = center.add(this.upVector.mul(this.screenHeight / 2));
-        // Vector px = center.add(right.mul(this.screenWidth / 2));
-        // Vector P = py.sub(this.upVector.mul(y
-        // *this.screenHeight).add(px.sub(right.mul(x * this.screenWidth))));
-        Vector P = center.sub(this.upVector.mul(y * this.screenHeight).sub(right.mul(x * this.screenWidth)));
+        Vector P = center.sub(this.upVector.mul(y * this.screenHeight).add(right.mul(x * this.screenWidth)));
         Ray pixelRay = new Ray(this.position, P.sub(position));
         return pixelRay;
     }
