@@ -16,20 +16,21 @@ public class Camera {
     public final boolean fisheye;
     public final double fisheye_param;
 
-    public Camera(Vector pos, Vector lookAt, Vector up, double screenDist, double screenWidth, double aspectRatio, boolean fisheye,
-            double fisheye_param) {
+    public Camera(Vector pos, Vector lookAt, Vector up, double screenDist, double screenWidth, double aspectRatio,
+            boolean fisheye, double fisheye_param) {
         this.position = pos;
         this.towards = lookAt.sub(pos).normalize();
         this.right = this.towards.cross(up).normalize();
         this.upVector = fixUpVector(up, this.towards, this.right);
         this.screenDist = screenDist;
         this.screenWidth = screenWidth;
-        this.screenHeight = screenWidth*aspectRatio;
+        this.screenHeight = screenWidth * aspectRatio;
         this.fisheye = fisheye;
         this.fisheye_param = fisheye_param;
     }
 
-    public Camera(Vector pos, Vector lookAt, Vector up, double screenDist, double screenWidth, double aspectRatio, boolean fisheye) {
+    public Camera(Vector pos, Vector lookAt, Vector up, double screenDist, double screenWidth, double aspectRatio,
+            boolean fisheye) {
         this(pos, lookAt, up, screenDist, screenWidth, aspectRatio, fisheye, 0.5);
     }
 
@@ -51,11 +52,13 @@ public class Camera {
     }
 
     public Ray pixelRay(double x, double y) {
-        Vector py = this.position.add(this.towards.mul(this.screenDist)).add(this.upVector.mul(this.screenHeight/2));
-        Vector px = this.position.add(this.towards.mul(this.screenDist)).add(right.mul(this.screenWidth/2));
-        Vector P = py.sub(this.upVector.mul(y + this.screenHeight*0.5))
-        .add(px.sub(right.mul(x + this.screenWidth*0.5)));
-        Ray pixelRay = new Ray(this.position, P.sub(position).normalize());
+        Vector center = this.position.add(this.towards.mul(this.screenDist));
+        // Vector py = center.add(this.upVector.mul(this.screenHeight / 2));
+        // Vector px = center.add(right.mul(this.screenWidth / 2));
+        // Vector P = py.sub(this.upVector.mul(y
+        // *this.screenHeight).add(px.sub(right.mul(x * this.screenWidth))));
+        Vector P = center.sub(this.upVector.mul(y * this.screenHeight).add(right.mul(x * this.screenWidth)));
+        Ray pixelRay = new Ray(this.position, P.sub(position));
         return pixelRay;
     }
 }
