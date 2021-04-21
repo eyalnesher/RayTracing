@@ -21,7 +21,7 @@ public class Plane extends Surface {
         double denominator = this.normal.dot(ray.direction);
         if (Math.abs(denominator) > 0) {
             Vector diff = this.normal.mul(distance).sub(ray.origin);
-            double length = diff.dot(this.normal);
+            double length = diff.dot(this.normal) / denominator;
             if (length >= 0) {
                 return Optional.of(new Pair<Vector, Vector>(ray.point(length), this.normal));
             }
