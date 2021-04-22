@@ -1,6 +1,7 @@
 package RayTracing;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 
 public class Box extends Surface {
@@ -104,20 +105,11 @@ public class Box extends Surface {
 
     @Override
     public Optional<Pair<Vector, Vector>> intersection(Ray ray) {
-        ArrayList<Pair<Vector, Vector>> intersections = new ArrayList<>();
-        for (Axis axis : Axis.values()) {
-            Pair<Plane, Plane> faces = this.faces(axis);
-            Optional<Pair<Vector, Vector>> intersection1 = faces.first().intersection(ray);
-            Optional<Pair<Vector, Vector>> intersection2 = faces.second().intersection(ray);
-            if (intersection1.isPresent() && this.inFaceBounds(intersection1.get().first(), axis)) {
-                intersections.add(intersection1.get());
-            }
-            if (intersection2.isPresent() && this.inFaceBounds(intersection2.get().first(), axis)) {
-                intersections.add(intersection2.get());
-            }
-        }
-
-        return intersections.stream()
+        return Arrays.stream(Axis.values())
+                .flatMap(axis -> Pair.stream(this.faces(axis)).map(face -> face.intersection(ray))
+                        .filter(intersection -> intersection.isPresent()
+                                && this.inFaceBounds(intersection.get().first(), axis)))
+                .map((Optional<Pair<Vector, Vector>> intersection) -> intersection.get())
                 .min((Pair<Vector, Vector> intersection1, Pair<Vector, Vector> intersection2) -> ray.origin
                         .compareDistances(intersection1.first(), intersection2.first()));
 
