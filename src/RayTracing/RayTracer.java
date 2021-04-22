@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.imageio.ImageIO;
 
@@ -205,13 +206,19 @@ public class RayTracer {
 		// blue component is in rgbData[(y * this.imageWidth + x) * 3 + 2]
 		//
 		// Each of the red, green and blue components should be a byte, i.e. 0-255
-		for (int y = 0; y < this.imageHeight; y++) {
-			for (int x = 0; x < this.imageWidth; x++) {
-				Ray pixelRay = s.camera.pixelRay(((double)x)/this.imageWidth - 0.5, ((double)y)/this.imageHeight - 0.5);
-				Vector pixelColor = pixelRay.trace(s);
-				rgbData[(y*this.imageWidth + x)*3] = (byte)(255*pixelColor.x);
-				rgbData[(y*this.imageWidth + x)*3 + 1] = (byte)(255*pixelColor.y);
-				rgbData[(y*this.imageWidth + x)*3 + 2] = (byte)(255*pixelColor.z);
+		for (int row = 0; row < this.imageHeight; row++) {
+			for (int column = 0; column < this.imageWidth; column++) {
+
+				double xRatio = ((double)column)/this.imageWidth - 0.5;
+				double yRatio = ((double)row)/this.imageHeight - 0.5;
+				Vector pixelColor = new Vector(0, 0, 0);
+				Optional<Ray> pixelRay = s.camera.pixelRay(xRatio, yRatio);
+				if (pixelRay.isPresent()) {
+					pixelColor = pixelRay.get().trace(s);
+				}
+				rgbData[(row*this.imageWidth + column)*3] = (byte)(255*pixelColor.x);
+				rgbData[(row*this.imageWidth + column)*3 + 1] = (byte)(255*pixelColor.y);
+				rgbData[(row*this.imageWidth + column)*3 + 2] = (byte)(255*pixelColor.z);
 				// System.out.println("Put value (" + pixelColor.x + ", " + pixelColor.y + ", " + pixelColor.z + ") in (" + x + "," + y + ")");
 			}
 		}

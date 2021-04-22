@@ -1,5 +1,6 @@
 package RayTracing;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -50,11 +51,35 @@ public class Camera {
         Vector fixed = right.cross(towards).normalize();
         return Stream.of(fixed, fixed.neg()).min((u, v) -> up.compareDistances(u, v)).get();
     }
-
-    public Ray pixelRay(double x, double y) {
-        Vector center = this.position.add(this.towards.mul(this.screenDist));
-        Vector P = center.sub(this.upVector.mul(y * this.screenHeight).add(right.mul(x * this.screenWidth)));
-        Ray pixelRay = new Ray(this.position, P.sub(position));
-        return pixelRay;
+    
+    public Vector mapPixel(Vector center, double x, double y) {
+        return center.sub(this.upVector.mul(y * this.screenHeight).add(right.mul(x * this.screenWidth)));
     }
+
+    public double reverseFishEye(double R) {
+        if (this.fisheye_param > 0) {
+            return Math.atan(R*this.fisheye_param/this.screenDist)/this.fisheye_param;
+        } else if (this.fisheye_param == 0) {
+            return R/this.screenDist;
+        } else {
+            return Math.asin(R*this.fisheye_param/this.screenDist)/this.fisheye_param;
+        }
+    }
+
+    public Optional<Ray> pixelRay(double xRatio, double yRatio) {
+        Vector center = this.position.add(this.towards.mul(this.screenDist));
+        if (fisheye) {
+            double newR = Math.sqrt(xRatio*xRatio + yRatio*yRatio);
+            double oldTheta= this.reverseFishEye(newR);
+            double oldR = this.screenDist*Math.tan(oldTheta);
+            if (newR != 0 && oldR/newR >= 1) {
+                xRatio *= oldR/newR;
+                yRatio *= oldR/newR;
+            } else {
+                return Optional.empty();
+            }
+        }
+        Vector P = mapPixel(center, xRatio, yRatio);
+        return Optional.of(new Ray(this.position, P.sub(position)));
+    } 
 }
