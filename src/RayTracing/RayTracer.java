@@ -176,6 +176,7 @@ public class RayTracer {
 					scene.addObject(new Box(new Vector(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2])),
 											Double.parseDouble(params[3]),
 											materials.get(Integer.parseInt(params[4])-1)));
+					System.out.println(String.format("Parsed box (line %d)", lineNum));
 				}else {
 					System.out.println(String.format("ERROR: Did not recognize object: %s (line %d)", code, lineNum));
 				}
